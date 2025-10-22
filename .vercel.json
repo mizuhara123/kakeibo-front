@@ -1,11 +1,10 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vue",
-  "env": {
-    "NODE_OPTIONS": "--openssl-legacy-provider",
-    "VUE_APP_BASEURL": "http://43.165.181.179:9090"
-  }
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "http://43.165.181.179:9090/$1"
+    }
+  ]
 }
 
 
