@@ -8,7 +8,8 @@
     }
   },
   "env": {
-    "NODE_VERSION": "18"
+    "NODE_VERSION": "18",
+    "VUE_APP_BASEURL": "http://43.165.181.179:9090"
   }
 }
-   
+
