@@ -1,4 +1,12 @@
 {
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "framework": "vue",
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -9,18 +17,8 @@
       "destination": "/index.html"
     }
   ],
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
-    }
-  ],
-  "framework": "vue",
   "env": {
     "NODE_ENV": "production"
   }
 }
-
-
 
