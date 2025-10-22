@@ -1,16 +1,12 @@
 {
-  "buildCommand": "CI='' npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vue",
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs22.x"
-    }
-  },
   "env": {
     "NODE_OPTIONS": "--openssl-legacy-provider",
     "VUE_APP_BASEURL": "http://43.165.181.179:9090"
   }
 }
+
 
 
