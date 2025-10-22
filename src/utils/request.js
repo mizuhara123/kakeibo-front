@@ -1,46 +1,39 @@
 import axios from 'axios'
-import router from "@/router";
+import ElementUI from 'element-ui'
+import { Message } from 'element-ui'
 
-// 创建可一个新的axios对象
+// 创建 axios 实例
 const request = axios.create({
-    baseURL: process.env.VUE_APP_BASEURL,   // 后端的接口地址  ip:port
-    timeout: 30000                          // 30s请求超时
+  baseURL: '/api',   // ✅ 改成 /api（通过 Vercel 代理后端）
+  timeout: 30000
 })
 
-// request 拦截器
-// 可以自请求发送前对请求做一些处理
-// 比如统一加token，对请求参数统一加密
+// 请求拦截器
 request.interceptors.request.use(config => {
-    config.headers['Content-Type'] = 'application/json;charset=utf-8';        // 设置请求头格式
-    let user = JSON.parse(localStorage.getItem("xm-user") || '{}')  // 获取缓存的用户信息
-    config.headers['token'] = user.token  // 设置请求头
-
-    return config
+  config.headers['Content-Type'] = 'application/json;charset=utf-8'
+  const token = localStorage.getItem("token")
+  if (token) {
+    config.headers['token'] = token
+  }
+  return config
 }, error => {
-    console.error('request error: ' + error) // for debug
-    return Promise.reject(error)
-});
+  return Promise.reject(error)
+})
 
-// response 拦截器
-// 可以在接口响应后统一处理结果
+// 响应拦截器
 request.interceptors.response.use(
-    response => {
-        let res = response.data;
-
-        // 兼容服务端返回的字符串数据
-        if (typeof res === 'string') {
-            res = res ? JSON.parse(res) : res
-        }
-        if (res.code === '401') {
-            router.push('/login')
-        }
-        return res;
-    },
-    error => {
-        console.error('response error: ' + error) // for debug
-        return Promise.reject(error)
+  response => {
+    let res = response.data
+    if (typeof res === 'string') {
+      res = res ? JSON.parse(res) : res
     }
+    return res
+  },
+  error => {
+    console.error('response error:', error)
+    Message.error('サーバー接続に失敗しました。')
+    return Promise.reject(error)
+  }
 )
-
 
 export default request
