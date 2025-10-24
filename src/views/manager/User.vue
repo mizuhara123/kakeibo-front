@@ -91,13 +91,13 @@
           ></el-date-picker>
         </el-form-item>
         <el-form-item label="アバター">
-          <el-upload
-            class="avatar-uploader"
-            action="/files/upload"
-            :headers="{ token: user.token }"
-            list-type="picture"
-            :on-success="handleAvatarSuccess"
-          >
+   <el-upload
+  class="avatar-uploader"
+  action="https://kakeibo-front1234.vercel.app/files/upload"
+  :headers="{ token: user.token }"
+  list-type="picture"
+  :on-success="handleAvatarSuccess"
+  >
             <el-button type="primary">画像をアップロード</el-button>
           </el-upload>
         </el-form-item>
