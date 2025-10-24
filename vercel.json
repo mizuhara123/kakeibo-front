@@ -5,8 +5,10 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "http://43.165.181.179:9090/$1" },
     { "source": "/files/(.*)", "destination": "http://43.165.181.179:9090/files/$1" },
+    { "source": "/upload/(.*)", "destination": "http://43.165.181.179:9090/upload/$1" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
+
 
 
