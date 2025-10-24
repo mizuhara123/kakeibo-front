@@ -4,7 +4,7 @@ import { Message } from 'element-ui'
 
 // 创建 axios 实例
 const request = axios.create({
-  baseURL: '/api',   // ✅ 改成 /api（通过 Vercel 代理后端）
+  baseURL: process.env.VUE_APP_BASE_API + '/api',
   timeout: 30000
 })
 
