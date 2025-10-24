@@ -96,7 +96,7 @@
         </el-form-item>
         <el-form-item label="カバー" prop="cover">
           <el-upload
-              :action="$baseUrl + '/files/upload'"
+             :action="'https://43.165.181.179:9090/files/upload'"
               :headers="{ token: user.token }"
               list-type="picture"
               :on-success="handleCoverSuccess"
