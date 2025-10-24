@@ -93,7 +93,7 @@
         <el-form-item label="アバター">
           <el-upload
             class="avatar-uploader"
-            :action="$baseUrl + '/files/upload'"
+            action="/files/upload"
             :headers="{ token: user.token }"
             list-type="picture"
             :on-success="handleAvatarSuccess"
