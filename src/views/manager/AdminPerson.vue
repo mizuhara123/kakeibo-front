@@ -4,10 +4,10 @@
       <el-form :model="user" label-width="100px" style="padding-right: 50px">
         <div style="margin: 15px; text-align: center">
           <el-upload
-              class="avatar-uploader"
-             :action="uploadUrl"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
+            class="avatar-uploader"
+            :action="uploadUrl"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
           >
             <img v-if="user.avatar" :src="user.avatar" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -39,11 +39,14 @@
 </template>
 
 <script>
+import { UPLOAD_URL } from '@/utils/upload'   // ✅ 新增导入上传路径
+
 export default {
   name: "AdminPerson",
   data() {
     return {
-      user: JSON.parse(localStorage.getItem('xm-user') || '{}')
+      user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
+      uploadUrl: UPLOAD_URL                    // ✅ 绑定上传 URL
     }
   },
   methods: {
