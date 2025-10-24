@@ -1,4 +1,4 @@
-<template>
+ <template>
   <div>
     <!-- 🔍 検索部分 -->
     <div class="search">
@@ -82,7 +82,7 @@
         <el-form-item label="アバター">
           <el-upload
             class="avatar-uploader"
-            :action="$baseUrl + '/files/upload'"
+            :action="'https://43.165.181.179:9090/files/upload'"
             :headers="{ token: user.token }"
             list-type="picture"
             :on-success="handleAvatarSuccess"
