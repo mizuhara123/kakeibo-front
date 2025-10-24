@@ -1,4 +1,4 @@
-const BASE = 'https://43.165.181.179:9090'
+const BASE = 'https://43.165.181.179'
 
 export const UPLOAD_URL = `${BASE}/files/upload`
 
