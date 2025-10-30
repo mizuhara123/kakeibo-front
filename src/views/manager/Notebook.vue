@@ -1,62 +1,75 @@
 <template>
   <div>
+    <!-- 🔍 検索欄 -->
     <div class="search">
       <el-input placeholder="タイトルを入力して検索" style="width: 200px" v-model="title"></el-input>
       <el-button type="info" plain style="margin-left: 10px" @click="load(1)">検索</el-button>
       <el-button type="warning" plain style="margin-left: 10px" @click="reset">リセット</el-button>
     </div>
 
+    <!-- 🧭 操作ボタン -->
     <div class="operation">
       <el-button type="primary" plain @click="handleAdd">新規作成</el-button>
       <el-button type="danger" plain @click="delBatch">一括削除</el-button>
     </div>
 
-    <div class="table"  v-if="user.role === 'ADMIN' && tableData.length">
-      <el-table :data="tableData" stripe  @selection-change="handleSelectionChange">
+    <!-- ✅ 管理者：表格表示 -->
+    <div class="table" v-if="user.role === 'ADMIN' && tableData.length">
+      <el-table :data="tableData" stripe @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="id" label="番号" width="80" align="center" sortable></el-table-column>
-        <el-table-column label="カバー">
+        <el-table-column label="カバー" width="120">
           <template v-slot="scope">
-            <div style="display: flex; align-items: center">
-              <el-image style="width: 50px;" v-if="scope.row.cover"
-                        :src="scope.row.cover" :preview-src-list="[scope.row.cover]"></el-image>
-            </div>
+            <el-image
+              style="width: 60px;"
+              v-if="scope.row.cover"
+              :src="scope.row.cover"
+              :preview-src-list="[scope.row.cover]"
+            ></el-image>
           </template>
         </el-table-column>
         <el-table-column prop="title" label="タイトル" show-overflow-tooltip></el-table-column>
-        <el-table-column label="内容">
+        <el-table-column label="内容" width="120">
           <template v-slot="scope">
-            <el-button @click="showContent(scope.row.content)">内容を表示</el-button>
+            <el-button @click="showContent(scope.row.content)" type="text">内容を表示</el-button>
           </template>
         </el-table-column>
-        <el-table-column prop="date" label="作成日"></el-table-column>
-        <el-table-column prop="userName" label="作成者"></el-table-column>
-
-        <el-table-column label="操作" width="180" align="center">
+        <el-table-column prop="date" label="作成日" width="180"></el-table-column>
+        <el-table-column prop="userName" label="作成者" width="150"></el-table-column>
+        <el-table-column label="操作" width="200" align="center">
           <template v-slot="scope">
             <el-button plain type="primary" @click="handleEdit(scope.row)" size="mini">編集</el-button>
-            <el-button plain type="danger" size="mini" @click=del(scope.row.id)>削除</el-button>
+            <el-button plain type="danger" size="mini" @click="del(scope.row.id)">削除</el-button>
           </template>
         </el-table-column>
       </el-table>
+
       <div class="pagination">
         <el-pagination
-            background
-            @current-change="handleCurrentChange"
-            :current-page="pageNum"
-            :page-sizes="[5, 10, 20]"
-            :page-size="pageSize"
-            layout="total, prev, pager, next"
-            :total="total">
+          background
+          @current-change="handleCurrentChange"
+          :current-page="pageNum"
+          :page-sizes="[5, 10, 20]"
+          :page-size="pageSize"
+          layout="total, prev, pager, next"
+          :total="total">
         </el-pagination>
       </div>
     </div>
 
+    <!-- ✅ 一般ユーザー：卡片模式 + 勾选框 -->
     <div v-else-if="tableData.length" style="margin-top: 10px">
       <el-row :gutter="10" style="margin-bottom: 10px">
         <el-col v-for="item in tableData" :key="item.id" :span="12" style="margin-bottom: 5px">
-          <div style="display: flex" class="card">
-            <div style="flex: 1">
+          <div class="card" style="display: flex; position: relative;">
+            <!-- ✅ 新增：用户复选框 -->
+            <el-checkbox
+              v-model="checkedIds"
+              :label="item.id"
+              style="position: absolute; top: 5px; left: 5px; z-index: 10;"
+            ></el-checkbox>
+
+            <div style="flex: 1; margin-left: 25px;">
               <div style="font-size: 20px; margin-bottom: 10px" class="line1">{{ item.title }}</div>
               <div style="color: #666; display: flex; align-items: center">
                 <div style="flex: 1">
@@ -70,25 +83,25 @@
                 </div>
               </div>
             </div>
-            <img :src="item.cover" alt="" style="width: 120px; height: 60px">
+            <img :src="item.cover" alt="" style="width: 120px; height: 60px; margin-left: 10px">
           </div>
         </el-col>
       </el-row>
 
       <div class="pagination">
         <el-pagination
-            background
-            @current-change="handleCurrentChange"
-            :current-page="pageNum"
-            :page-sizes="[5, 10, 20]"
-            :page-size="pageSize"
-            layout="total, prev, pager, next"
-            :total="total">
+          background
+          @current-change="handleCurrentChange"
+          :current-page="pageNum"
+          :page-sizes="[5, 10, 20]"
+          :page-size="pageSize"
+          layout="total, prev, pager, next"
+          :total="total">
         </el-pagination>
       </div>
     </div>
 
-    <!-- 編集・追加用ダイアログ -->
+    <!-- ✏️ 編集・追加用ダイアログ -->
     <el-dialog title="情報" :visible.sync="fromVisible" width="60%" :close-on-click-modal="false" destroy-on-close>
       <el-form label-width="100px" style="padding-right: 50px" :model="form" :rules="rules" ref="formRef">
         <el-form-item prop="title" label="タイトル">
@@ -96,10 +109,10 @@
         </el-form-item>
         <el-form-item label="カバー" prop="cover">
           <el-upload
-             :action="'https://43.165.181.179:9090/files/upload'"
-              :headers="{ token: user.token }"
-              list-type="picture"
-              :on-success="handleCoverSuccess"
+            :action="'https://43.165.181.179:9090/files/upload'"
+            :headers="{ token: user.token }"
+            list-type="picture"
+            :on-success="handleCoverSuccess"
           >
             <el-button type="primary">カバーをアップロード</el-button>
           </el-upload>
@@ -114,7 +127,7 @@
       </div>
     </el-dialog>
 
-    <!-- 内容閲覧用ダイアログ -->
+    <!-- 📖 内容閲覧用ダイアログ -->
     <el-dialog title="情報" :visible.sync="contentVisible" width="50%" :close-on-click-modal="false" destroy-on-close>
       <div class="w-e-text">
         <div v-html="content"></div>
@@ -142,11 +155,10 @@ export default {
       form: {},
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
       rules: {
-        title: [
-          {required: true, message: 'タイトルを入力してください', trigger: 'blur'},
-        ],
+        title: [{ required: true, message: 'タイトルを入力してください', trigger: 'blur' }],
       },
-      ids: [],
+      ids: [],         // 管理者选中
+      checkedIds: [],  // 用户卡片选中
       editor: null,
       contentVisible: false,
       content: ''
@@ -191,10 +203,10 @@ export default {
       })
     },
     del(id) {
-      this.$confirm('削除してもよろしいですか？', '削除の確認', {type: "warning"}).then(() => {
+      this.$confirm('削除してもよろしいですか？', '削除の確認', { type: "warning" }).then(() => {
         this.$request.delete('/notebook/delete/' + id).then(res => {
           if (res.code === '200') {
-            this.$message.success('操作が成功しました')
+            this.$message.success('削除しました')
             this.load(1)
           } else {
             this.$message.error(res.msg)
@@ -206,20 +218,28 @@ export default {
       this.ids = rows.map(v => v.id)
     },
     delBatch() {
-      if (!this.ids.length) {
+      // ✅ 管理者用 ids，用户用 checkedIds
+      const selected = this.user.role === 'ADMIN' ? this.ids : this.checkedIds
+
+      if (!selected.length) {
         this.$message.warning('データを選択してください')
         return
       }
-      this.$confirm('これらのデータを一括削除してもよろしいですか？', '削除の確認', {type: "warning"}).then(() => {
-        this.$request.delete('/notebook/delete/batch', {data: this.ids}).then(res => {
-          if (res.code === '200') {
-            this.$message.success('操作が成功しました')
-            this.load(1)
-          } else {
-            this.$message.error(res.msg)
-          }
+
+      this.$confirm('これらのデータを一括削除してもよろしいですか？', '削除の確認', { type: "warning" })
+        .then(() => {
+          this.$request.delete('/notebook/delete/batch', { data: selected }).then(res => {
+            if (res.code === '200') {
+              this.$message.success('削除しました')
+              this.load(1)
+              this.ids = []
+              this.checkedIds = []
+            } else {
+              this.$message.error(res.msg)
+            }
+          })
         })
-      }).catch(() => {})
+        .catch(() => {})
     },
     load(pageNum) {
       if (pageNum) this.pageNum = pageNum
@@ -263,4 +283,10 @@ export default {
 </script>
 
 <style scoped>
+.card {
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
 </style>
