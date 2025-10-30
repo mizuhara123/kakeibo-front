@@ -10,7 +10,7 @@
     <!-- 🧭 操作ボタン -->
     <div class="operation">
       <el-button type="primary" plain @click="handleAdd">新規作成</el-button>
-      <el-button type="danger" plain @click="delBatch">一括削除</el-button>
+     <!--  <el-button type="danger" plain @click="delBatch">一括削除</el-button> -->
       <el-button type="success" plain v-if="tableData.length" @click="toggleSelectAll">
         {{ isAllSelected ? '全解除' : '全選択' }}
       </el-button>
