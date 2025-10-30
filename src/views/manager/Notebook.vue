@@ -11,9 +11,12 @@
     <div class="operation">
       <el-button type="primary" plain @click="handleAdd">新規作成</el-button>
       <el-button type="danger" plain @click="delBatch">一括削除</el-button>
+      <el-button type="success" plain v-if="tableData.length" @click="toggleSelectAll">
+        {{ isAllSelected ? '全解除' : '全選択' }}
+      </el-button>
     </div>
 
-    <!-- ✅ 管理者：表格表示 -->
+    <!-- ✅ 管理者：表格模式 -->
     <div class="table" v-if="user.role === 'ADMIN' && tableData.length">
       <el-table :data="tableData" stripe @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
@@ -57,19 +60,19 @@
       </div>
     </div>
 
-    <!-- ✅ 一般ユーザー：卡片模式 + 勾选框 -->
+    <!-- ✅ 一般ユーザー：卡片模式 + 右上角复选框 -->
     <div v-else-if="tableData.length" style="margin-top: 10px">
       <el-row :gutter="10" style="margin-bottom: 10px">
         <el-col v-for="item in tableData" :key="item.id" :span="12" style="margin-bottom: 5px">
-          <div class="card" style="display: flex; position: relative;">
-            <!-- ✅ 新增：用户复选框 -->
+          <div class="card">
+            <!-- ✅ 右上角选择框 -->
             <el-checkbox
               v-model="checkedIds"
               :label="item.id"
-              style="position: absolute; top: 5px; left: 5px; z-index: 10;"
+              class="note-checkbox"
             ></el-checkbox>
 
-            <div style="flex: 1; margin-left: 25px;">
+            <div style="flex: 1;">
               <div style="font-size: 20px; margin-bottom: 10px" class="line1">{{ item.title }}</div>
               <div style="color: #666; display: flex; align-items: center">
                 <div style="flex: 1">
@@ -101,7 +104,7 @@
       </div>
     </div>
 
-    <!-- ✏️ 編集・追加用ダイアログ -->
+    <!-- ✏️ 編集・追加ダイアログ -->
     <el-dialog title="情報" :visible.sync="fromVisible" width="60%" :close-on-click-modal="false" destroy-on-close>
       <el-form label-width="100px" style="padding-right: 50px" :model="form" :rules="rules" ref="formRef">
         <el-form-item prop="title" label="タイトル">
@@ -127,7 +130,7 @@
       </div>
     </el-dialog>
 
-    <!-- 📖 内容閲覧用ダイアログ -->
+    <!-- 📖 閲覧用 -->
     <el-dialog title="情報" :visible.sync="contentVisible" width="50%" :close-on-click-modal="false" destroy-on-close>
       <div class="w-e-text">
         <div v-html="content"></div>
@@ -164,10 +167,22 @@ export default {
       content: ''
     }
   },
+  computed: {
+    isAllSelected() {
+      return this.checkedIds.length === this.tableData.length && this.tableData.length > 0
+    }
+  },
   created() {
     this.load(1)
   },
   methods: {
+    toggleSelectAll() {
+      if (this.isAllSelected) {
+        this.checkedIds = []
+      } else {
+        this.checkedIds = this.tableData.map(item => item.id)
+      }
+    },
     showContent(content) {
       this.content = content
       this.contentVisible = true
@@ -218,14 +233,11 @@ export default {
       this.ids = rows.map(v => v.id)
     },
     delBatch() {
-      // ✅ 管理者用 ids，用户用 checkedIds
       const selected = this.user.role === 'ADMIN' ? this.ids : this.checkedIds
-
       if (!selected.length) {
         this.$message.warning('データを選択してください')
         return
       }
-
       this.$confirm('これらのデータを一括削除してもよろしいですか？', '削除の確認', { type: "warning" })
         .then(() => {
           this.$request.delete('/notebook/delete/batch', { data: selected }).then(res => {
@@ -244,11 +256,7 @@ export default {
     load(pageNum) {
       if (pageNum) this.pageNum = pageNum
       this.$request.get('/notebook/selectPage', {
-        params: {
-          pageNum: this.pageNum,
-          pageSize: this.pageSize,
-          title: this.title,
-        }
+        params: { pageNum: this.pageNum, pageSize: this.pageSize, title: this.title }
       }).then(res => {
         this.tableData = res.data?.list
         this.total = res.data?.total
@@ -284,9 +292,24 @@ export default {
 
 <style scoped>
 .card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   border: 1px solid #ebeef5;
   border-radius: 8px;
   padding: 10px;
+  background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
+.note-checkbox {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 99;
+  background: #fff;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
 </style>
+
